@@ -1,6 +1,8 @@
 import React from "react";
 import "./App.css";
+import PlayingCard from "./Components/PlayingCard";
 import { makeShuffledDeck } from "./utils.js";
+import logo from "./logo.png";
 
 class App extends React.Component {
   constructor(props) {
@@ -64,12 +66,21 @@ class App extends React.Component {
   };
 
   render() {
-    const currCardElems = this.state.currCards.map(({ name, suit }) => (
+    // We cannot run set state here
+    const currCardElems = this.state.currCards.map(({ name, suit }, index) =>
       // Give each list element a unique key
-      <div key={`${name}${suit}`}>
-        {name} of {suit}
-      </div>
-    ));
+      {
+        const nameSuit = `${name}${suit}`;
+        return (
+          <PlayingCard
+            name={name}
+            suit={suit}
+            player={index + 1}
+            key={nameSuit}
+          />
+        );
+      }
+    );
 
     const winnerMessage = this.state.whoWinsTheRound
       ? `Player ${this.state.whoWinsTheRound} has won the game`
@@ -100,26 +111,30 @@ class App extends React.Component {
     return (
       <div className="App">
         <header className="App-header">
+          <img src={logo} className="logo" />
           <h3>High Card 🚀</h3>
-          {currCardElems}
+          <div style={{ display: "flex" }}>{currCardElems}</div>
           <br />
+
           <button
             className="button"
-            onClick={numOfRoundsLeft === 0 ? this.resetGame : this.dealCards}
+            onClick={
+              numOfRoundsLeft === 0
+                ? () => this.resetGame()
+                : () => this.dealCards()
+            }
           >
             Deal
           </button>
-
-          <p>{this.state.hasGameStarted && winnerMessage}</p>
-
-          <p>{this.state.hasGameStarted && playerOneWinngMessage}</p>
-
-          <p>{this.state.hasGameStarted && playerTwoWinngMessage}</p>
-
-          <p>{this.state.hasGameStarted && drawRoundsMessage}</p>
-
-          <p>{this.state.hasGameStarted && displayRoundsLeftMessage}</p>
-
+          {this.state.hasGameStarted && (
+            <>
+              <p>{winnerMessage}</p>
+              <p>{playerOneWinngMessage}</p>
+              <p>{playerTwoWinngMessage}</p>
+              <p>{drawRoundsMessage}</p>
+              <p>{displayRoundsLeftMessage}</p>
+            </>
+          )}
           <p>{numOfRoundsLeft === 0 && displayGameWinnerMessage}</p>
         </header>
       </div>
